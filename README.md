@@ -12,6 +12,11 @@ Instagram Reels and Pinterest.
 Each day has its own folder. Every video has a caption file with the same name, with text and
 hashtags for TikTok, YouTube, Instagram and Pinterest. `schedule.csv` is the posting checklist.
 
+## This week: October 4–10, 2026
+
+21 history tales, 3 a day (07:30, 12:30, 19:30). Open `schedule.csv` in Excel or Google Sheets
+to see each story and tick off where you've posted it.
+
 ## About the videos
 
 - Vertical 1080×1920 and just over 1 minute long. A calm narrator tells a true story from history,
