@@ -1,0 +1,51 @@
+name: Make and post a video
+
+on:
+  schedule:            # times are UTC: adjust to your audience
+    - cron: "30 7 * * *"
+    - cron: "30 12 * * *"
+    - cron: "30 19 * * *"
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Post to the platforms (1) or dry run (0)"
+        default: "0"
+
+permissions:
+  contents: write
+
+jobs:
+  make:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11", cache: pip, cache-dependency-path: pipeline/requirements.txt }
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg fonts-dejavu-core
+      - run: pip install -r pipeline/requirements.txt
+      - uses: actions/cache@v4
+        with: { path: .cache, key: kokoro-models-v1 }
+      - name: Generate (and post)
+        env:
+          PUBLISH: ${{ github.event_name == 'schedule' && '1' || inputs.publish }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+          REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          TIKTOK_ACCESS_TOKEN: ${{ secrets.TIKTOK_ACCESS_TOKEN }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
+        run: python pipeline/run.py --slot "$(date -u +%H%M)" --date "$(date -u +%F)"
+      - name: Save results
+        run: |
+          git config user.name "violetnix-bot"
+          git config user.email "violetnix-bot@users.noreply.github.com"
+          git add -A . ':!.cache'
+          git commit -m "Add video $(date -u +'%F %H:%M')" || exit 0
+          git pull --rebase origin "${GITHUB_REF_NAME}" && git push

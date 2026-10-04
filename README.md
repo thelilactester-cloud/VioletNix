@@ -25,3 +25,8 @@ to see each story and tick off where you've posted it.
   open-source wallpaper collections of elementary OS, Pop!_OS and Cassidy James.
 - Narration: [Kokoro](https://github.com/thewh1teagle/kokoro-onnx), an open-source AI voice
   (Apache 2.0). Tick the "AI-generated" label when posting.
+
+## Automation
+
+See [`pipeline/README.md`](pipeline/README.md): research, script, voice, music, video and posting
+(YouTube, TikTok drafts, Facebook Reels) in one scheduled workflow.
