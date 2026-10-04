@@ -13,3 +13,12 @@ each track in a `LICENSES.md` file next to them.
 
 **Do not put chart songs or other people's copyrighted music here.** YouTube and Facebook will claim
 or mute the video. For TikTok trending sounds, use the draft workflow described in `pipeline/README.md`.
+
+## Licence gate (required)
+The pipeline **only uses tracks listed by file name in `music/LICENSES.md`**. For each track add a line:
+
+```
+my-track.mp3 | Pixabay Music | https://pixabay.com/music/... | Pixabay Content Licence, no attribution required
+```
+An unlisted track is skipped. This keeps uncleared music out of videos, which is the most common way
+channels get claims and lose monetization.

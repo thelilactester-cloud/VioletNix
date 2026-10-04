@@ -5,7 +5,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 MUSIC_DIR = ROOT / "music"
 BACKGROUND_DIR = ROOT / "backgrounds"
-STATE_FILE = ROOT / "state" / "used_topics.json"
+STATE_FILE = ROOT / "state" / "history.json"
 SCHEDULE_CSV = ROOT / "schedule.csv"
 CACHE_DIR = ROOT / ".cache"
 
@@ -38,3 +38,9 @@ YT_REFRESH_TOKEN = os.getenv("YT_REFRESH_TOKEN")
 TIKTOK_ACCESS_TOKEN = os.getenv("TIKTOK_ACCESS_TOKEN")
 FB_PAGE_ID = os.getenv("FB_PAGE_ID")
 FB_PAGE_TOKEN = os.getenv("FB_PAGE_TOKEN")
+
+# --- Monetization safeguards ---
+MIN_SECONDS = 61           # TikTok Creator Rewards needs videos over 1 minute
+MAX_PER_DAY = int(os.getenv("MAX_PER_DAY", "3"))      # avoid "mass-produced" content flags
+REVIEW_FIRST_N = int(os.getenv("REVIEW_FIRST_N", "5"))  # first N videos are never auto-posted
+MAX_SIMILARITY = 0.45      # reject scripts too close to a recent one

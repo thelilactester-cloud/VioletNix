@@ -1,4 +1,5 @@
 """Write an original story script, then fact-check it against Wikipedia."""
+import difflib
 import json
 import random
 
@@ -27,7 +28,7 @@ Pick ONE real, well-documented historical story that has a Wikipedia article. Te
 {style}
 
 Rules:
-- 150-170 words of narration, spoken English, short sentences, concrete details, no emojis.
+- 180-195 words of narration (it must run longer than 61 seconds when spoken), spoken English, short sentences, concrete details, no emojis.
 - Sentence 1 is a hook that creates a question in the viewer's mind. Last 1-2 sentences are the lesson for today.
 - Only state facts you are certain are true. If unsure of a number or date, leave it out.
 - Original wording. No copied lines from any video or article.
@@ -59,17 +60,39 @@ def wikipedia_extract(title):
     return (page.get("extract") or "")[:6000]
 
 
-def used_topics():
+def history():
     try:
         return json.loads(config.STATE_FILE.read_text())
     except (OSError, ValueError):
         return []
 
 
-def remember(topic):
-    topics = used_topics() + [topic]
+def used_topics():
+    return [h["topic"] for h in history()]
+
+
+def remember(draft):
     config.STATE_FILE.parent.mkdir(exist_ok=True)
-    config.STATE_FILE.write_text(json.dumps(topics, indent=1))
+    config.STATE_FILE.write_text(json.dumps(
+        history() + [{k: draft[k] for k in ("topic", "hook", "narration")}], indent=1))
+
+
+def originality_issues(draft):
+    """Platforms demote repetitive, mass-produced content: reject near-duplicates and thin scripts."""
+    issues, words = [], len(draft["narration"].split())
+    if not 175 <= words <= 205:
+        issues.append(f"narration is {words} words (need 175-205 for a 61s+ video)")
+    recent = history()[-30:]
+    if draft["topic"].lower() in (h["topic"].lower() for h in recent):
+        issues.append("topic already used")
+    if draft["hook"].lower() in (h["hook"].lower() for h in recent):
+        issues.append("hook already used")
+    for h in recent:
+        ratio = difflib.SequenceMatcher(None, draft["narration"].lower(), h["narration"].lower()).ratio()
+        if ratio > config.MAX_SIMILARITY:
+            issues.append(f"too similar ({ratio:.0%}) to a previous script about {h['topic']}")
+            break
+    return issues
 
 
 def generate(signals, attempts=3):
@@ -77,6 +100,10 @@ def generate(signals, attempts=3):
     sig = "\n".join(f"- {s['title']} ({s['source']})" for s in signals[:25]) or "- (none available)"
     for n in range(attempts):
         draft = llm.ask_json(PROMPT.format(signals=sig, used=used[-60:], style=random.choice(STYLES)))
+        issues = originality_issues(draft)
+        if issues:
+            print(f"[script] attempt {n + 1}: rejected: {issues}")
+            continue
         extract = wikipedia_extract(draft.get("wikipedia_title", ""))
         if not extract:
             print(f"[script] attempt {n + 1}: no Wikipedia article for {draft.get('wikipedia_title')!r}")

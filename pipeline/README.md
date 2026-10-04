@@ -49,5 +49,5 @@ each platform is in the video's `.txt` file.
 ## Tips
 - Label AI voice and AI-assisted content when the platform asks (YouTube sets it automatically here).
 - Vary hooks and styles; platforms demote near-identical mass-produced videos. The prompt already rotates styles.
-- Review the first few scripts yourself before leaving it fully automatic.
+- The first 5 videos are saved but not auto-posted so you can review them. See [`COMPLIANCE.md`](COMPLIANCE.md) for the monetization rules the pipeline enforces.
 - Videos are committed to the repo (about 1.5 MB each); move to release assets or cloud storage if size grows.
