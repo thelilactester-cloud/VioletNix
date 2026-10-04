@@ -8,7 +8,7 @@ script.py    Gemini (free tier) writes an original script, varied style each tim
              then fact-checks it against the Wikipedia article. Fails closed: no verified script, no video.
 voice.py     Kokoro (local, free). Sentence-by-sentence: slower hook and lesson, varied pauses
 music.py     royalty-free track from music/, ducked under the voice
-render.py    Pexels photos (free key) with slow zoom, burned-in word-group captions, 1080x1920
+render.py    free stock photos (Pixabay or Pexels key) with slow zoom, burned-in word-group captions, 1080x1920
 publish.py   YouTube, TikTok (as draft), Facebook Reels
 run.py       runs all of the above, writes the caption file and updates schedule.csv
 ```
@@ -24,7 +24,8 @@ Put a few photos in `backgrounds/` and a track in `music/` first.
 | Secret | Where | Needed? |
 |---|---|---|
 | `GEMINI_API_KEY` | aistudio.google.com/apikey | yes (script writing; free tier) |
-| `PEXELS_API_KEY` | pexels.com/api | recommended (scene photos) |
+| `PIXABAY_API_KEY` | pixabay.com/api/docs (sign up, key shown on the page) | recommended (scene photos) |
+| `PEXELS_API_KEY` | pexels.com/api (new keys sometimes paused) | optional alternative |
 | `REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET` | reddit.com/prefs/apps (script type) | optional |
 | `YOUTUBE_API_KEY` | Google Cloud Console, YouTube Data API v3 | optional (trend research) |
 | `YT_CLIENT_ID`, `YT_CLIENT_SECRET`, `YT_REFRESH_TOKEN` | OAuth client for YouTube upload | for auto-posting to YouTube |

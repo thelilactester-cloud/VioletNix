@@ -28,7 +28,8 @@ KOKORO_VOICES = os.getenv("KOKORO_VOICES", str(CACHE_DIR / "voices-v1.0.bin"))
 KOKORO_VOICE = os.getenv("KOKORO_VOICE", "af_heart")
 
 # --- Visuals ---
-PEXELS_API_KEY = os.getenv("PEXELS_API_KEY")  # free key; photos are free for commercial use
+PEXELS_API_KEY = os.getenv("PEXELS_API_KEY")    # free key (issuance is sometimes paused)
+PIXABAY_API_KEY = os.getenv("PIXABAY_API_KEY")  # free key, instant; photos free for commercial use
 
 # --- Publishing (nothing is posted unless PUBLISH=1) ---
 PUBLISH = os.getenv("PUBLISH") == "1"

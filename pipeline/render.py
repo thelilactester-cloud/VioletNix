@@ -16,28 +16,52 @@ def duration(path):
         ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(path)]))
 
 
+credit = "free-licence stock photos"
+
+
+def _pexels(kw, dest):
+    r = requests.get("https://api.pexels.com/v1/search", timeout=20,
+                     headers={"Authorization": config.PEXELS_API_KEY},
+                     params={"query": kw, "orientation": "portrait", "per_page": 8})
+    photos = r.json().get("photos", [])
+    if not photos:
+        return False
+    dest.write_bytes(requests.get(random.choice(photos)["src"]["portrait"], timeout=30).content)
+    return True
+
+
+def _pixabay(kw, dest):
+    r = requests.get("https://pixabay.com/api/", timeout=20, params={
+        "key": config.PIXABAY_API_KEY, "q": kw, "orientation": "vertical", "image_type": "photo",
+        "safesearch": "true", "per_page": 20, "min_height": 1200})
+    hits = r.json().get("hits", [])
+    if not hits:
+        return False
+    dest.write_bytes(requests.get(random.choice(hits)["largeImageURL"], timeout=30).content)
+    return True
+
+
 def fetch_images(keywords, workdir):
-    """Pexels (free API) per scene keyword; fall back to local backgrounds/."""
+    """Free stock photos per scene keyword (Pexels or Pixabay); fall back to local backgrounds/."""
+    global credit
+    source = (("Pexels", _pexels) if config.PEXELS_API_KEY
+              else ("Pixabay", _pixabay) if config.PIXABAY_API_KEY else None)
     images = []
-    if config.PEXELS_API_KEY:
+    if source:
         for i, kw in enumerate(keywords):
+            dest = Path(workdir) / f"scene{i}.jpg"
             try:
-                r = requests.get("https://api.pexels.com/v1/search", timeout=20,
-                                 headers={"Authorization": config.PEXELS_API_KEY},
-                                 params={"query": kw, "orientation": "portrait", "per_page": 8})
-                photos = r.json().get("photos", [])
-                if photos:
-                    url = random.choice(photos)["src"]["portrait"]
-                    dest = Path(workdir) / f"scene{i}.jpg"
-                    dest.write_bytes(requests.get(url, timeout=30).content)
+                if source[1](kw, dest):
                     images.append(dest)
             except Exception as exc:
-                print(f"[render] pexels '{kw}' failed: {exc}")
+                print(f"[render] {source[0]} '{kw}' failed: {exc}")
+        if images:
+            credit = f"Photos: {source[0]}"
     local = [p for p in config.BACKGROUND_DIR.glob("*") if p.suffix.lower() in IMG_EXTS]
     while len(images) < len(keywords) and local:
         images.append(random.choice(local))
     if not images:
-        raise RuntimeError("no images: set PEXELS_API_KEY or put photos in backgrounds/")
+        raise RuntimeError("no images: set PIXABAY_API_KEY (or PEXELS_API_KEY) or put photos in backgrounds/")
     return images
 
 

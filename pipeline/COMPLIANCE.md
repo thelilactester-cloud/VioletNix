@@ -11,7 +11,7 @@ The pipeline enforces what it can. Thresholds and policies change: re-check each
 | Max 3 videos per day | Avoid mass-production patterns | `MAX_PER_DAY` |
 | First 5 videos saved but not auto-posted | You check quality and facts before going live | `REVIEW_FIRST_N` |
 | Only music listed in `music/LICENSES.md` | Copyright claims block monetization | `music.py` |
-| AI disclosure line, source link and photo credit in every caption; YouTube's synthetic-media flag set | Platform AI-labelling rules | `run.py`, `publish.py` |
+| AI disclosure line, source link and stock-photo credit in every caption; YouTube's synthetic-media flag set | Platform AI-labelling rules | `run.py`, `publish.py` |
 | Not made for kids; vertical, no watermarks, no reposted clips | Ad eligibility; originality | `publish.py`, `render.py` |
 
 ## Things only you can do

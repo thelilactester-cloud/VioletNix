@@ -23,22 +23,22 @@ import voice
 PLATFORMS = ["tiktok", "youtube", "instagram", "pinterest", "facebook"]
 CORE_TAGS = ["history", "storytime", "lifelessons"]
 TAGLINE = "📜 Stories from the past. Lessons for today."
-DISCLOSURE = "🤖 AI-narrated. Photos: Pexels."
+DISCLOSURE = "🤖 AI-narrated."
 
 
-def captions(draft):
+def captions(draft, credit):
     tags = list(dict.fromkeys(CORE_TAGS + draft["hashtags"]))
     tag = lambda *extra: " ".join(f"#{t}" for t in tags + list(extra))
     hook, title = draft["hook"], draft["title"]
     wiki = "https://en.wikipedia.org/wiki/" + draft["wikipedia_title"].replace(" ", "_")
     body = (f"{hook} ✨\n\n{TAGLINE}\n\nDid you know this story?\n\n"
-            f"Source: {wiki}\n{DISCLOSURE}\n\n")
+            f"Source: {wiki}\n{DISCLOSURE} {credit}\n\n")
     return (f"=== TIKTOK ===\n{body}{tag('fyp')}\n\n"
             f"=== YOUTUBE ===\nTITLE: {title}\n{body}{tag('shorts')}\n\n"
             f"=== INSTAGRAM ===\n{body}{tag('reels')}\n\n"
             f"=== FACEBOOK ===\n{body}{tag('reels')}\n\n"
             f"=== PINTEREST (video Pin) ===\nTITLE: {title}\n"
-            f"DESCRIPTION: {hook} Did you know this story? {DISCLOSURE} Keywords: {draft['pinterest_keywords']}.\n"
+            f"DESCRIPTION: {hook} Did you know this story? {DISCLOSURE} {credit}. Keywords: {draft['pinterest_keywords']}.\n"
             f"BOARD: Motivation & Mindset\n"), tags
 
 
@@ -103,7 +103,7 @@ def main():
         # narration-only copy for TikTok: add a trending sound in the app
         render.mux(silent, narration, out_dir / f"{stem}-tiktok.mp4")
 
-    text, tags = captions(draft)
+    text, tags = captions(draft, render.credit)
     (out_dir / f"{stem}.txt").write_text(text, encoding="utf-8")
     posted = {}
     reviewed = len(script.history())
